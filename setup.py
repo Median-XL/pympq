@@ -37,6 +37,7 @@ setup(
     name='pympq',
     version=get_version(),
     author="Median XL",
+    url="https://github.com/Median-XL/pympq",
     description='python implementation of the stormlib API',
     classifiers=[
         "Environment :: Win32 (MS Windows)",
