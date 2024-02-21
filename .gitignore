@@ -29,6 +29,10 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
-msvcoutput/
 
+*.egg-info/
+build/
+dist/
+
+msvcoutput/
 build.ps1
