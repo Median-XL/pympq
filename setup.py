@@ -1,5 +1,7 @@
 import os
+import shutil
 import struct
+from pathlib import Path
 
 from setuptools import Extension, setup
 
@@ -22,6 +24,12 @@ def get_arch() -> str:
         return "x86"
     else:
         raise ValueError("Can't determine architecture")
+
+
+# hack'ish workaround to get StormLib.dll included next
+# to the generated .pyd in our installed module
+Path("pympq\\").mkdir(exist_ok=True)
+shutil.copyfile(f"stormlib\\{get_arch()}\\StormLib.dll", "pympq\\StormLib.dll")
 
 
 pympq_ext = Extension(
@@ -53,7 +61,10 @@ setup(
     ],
     ext_package="pympq",
     ext_modules=[pympq_ext],
-    data_files=[
-        ("lib\\site-packages\\pympq", [f"stormlib\\{get_arch()}\\stormlib.dll"]),
-    ],
+    include_package_data=True,
+    packages = ["pympq"],
+    package_dir={"pympq": "pympq"},
+    package_data={
+        "pympq": ["*.dll"],
+    },
 )
