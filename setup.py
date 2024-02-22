@@ -28,7 +28,6 @@ def get_arch() -> str:
 
 # hack'ish workaround to get StormLib.dll included next
 # to the generated .pyd in our installed module
-Path("pympq\\").mkdir(exist_ok=True)
 shutil.copyfile(f"stormlib\\{get_arch()}\\StormLib.dll", "pympq\\StormLib.dll")
 
 
