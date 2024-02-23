@@ -33,6 +33,8 @@ bld/
 *.egg-info/
 build/
 dist/
+venv/
+.venv/
 
 msvcoutput/
 build.ps1

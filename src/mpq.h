@@ -27,6 +27,8 @@ static PyObject* method_mpqobj_close(MpqObject* self, PyObject* args) {
 }
 
 static PyObject* method_mpqobj_ctxmanager_enter(MpqObject* self, PyObject* args) {
+
+    Py_XINCREF(self);
     return (PyObject*)self;
 }
 

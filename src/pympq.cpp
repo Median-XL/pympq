@@ -39,15 +39,13 @@ PyObject* method_create_archive(PyObject* self, PyObject* args) {
     }
 
     wchar_t* mpq_name_unicode = Py_DecodeLocale(mpq_name, 0);
+    MpqObject* mpq_instance = (MpqObject*)PyObject_CallObject((PyObject*)&MpqObjectType, nullptr);
 
-    PyObject* mpq_instance = PyObject_CallObject((PyObject*)&MpqObjectType, nullptr);
-    HANDLE* hmpq = &(((MpqObject*)mpq_instance)->hmpq);
-
-    if (!SFileCreateArchive(mpq_name_unicode, combined_flags, max_file_count, hmpq)) {
+    if (!SFileCreateArchive(mpq_name_unicode, combined_flags, max_file_count, &(mpq_instance->hmpq))) {
         return PyErr_Format(PympqBaseException, "Failed to create archive, error code: '%d'", GetLastError());
     }
 
-    return mpq_instance;
+    return (PyObject*)mpq_instance;
 }
 
 static PyMethodDef pympq_method_defs[] = {
