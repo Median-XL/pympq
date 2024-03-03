@@ -19,29 +19,28 @@ PyDoc_STRVAR(
 );
 PyObject* method_create_archive(PyObject* self, PyObject* args) {
 
-    char* mpq_name = nullptr;
-    PyObject* create_flags = nullptr;
-    unsigned int max_file_count = 0;
+    char* mpq_filename_arg = nullptr;
+    PyObject* flags_arg = nullptr;
+    unsigned int max_file_count_arg = 0;
 
-    if (!PyArg_ParseTuple(args, "sOI", &mpq_name, &create_flags, &max_file_count)) {
+    if (!PyArg_ParseTuple(args, "sOI", &mpq_filename_arg, &flags_arg, &max_file_count_arg)) {
         return nullptr;
     }
 
-    unsigned int combined_flags = 0;
+    unsigned int flags = 0;
+    for (int x = 0; x < PyList_Size(flags_arg); x++) {
 
-    for (int x = 0; x < PyList_Size(create_flags); x++) {
-
-        PyObject* list_item = PyList_GetItem(create_flags, x);
+        PyObject* list_item = PyList_GetItem(flags_arg, x);
 
         if (unsigned int flag = get_mpq_create_flag_by_alias(PyLong_AsLong(list_item))) {
-            combined_flags |= flag;
+            flags |= flag;
         }
     }
 
-    wchar_t* mpq_name_unicode = Py_DecodeLocale(mpq_name, 0);
+    wchar_t* mpq_filename = Py_DecodeLocale(mpq_filename_arg, 0);
     MpqObject* mpq_instance = (MpqObject*)PyObject_CallObject((PyObject*)&MpqObjectType, nullptr);
 
-    if (!SFileCreateArchive(mpq_name_unicode, combined_flags, max_file_count, &(mpq_instance->hmpq))) {
+    if (!SFileCreateArchive(mpq_filename, flags, max_file_count_arg, &(mpq_instance->hmpq))) {
         return PyErr_Format(PympqBaseException, "Failed to create archive, error code: '%d'", GetLastError());
     }
 
