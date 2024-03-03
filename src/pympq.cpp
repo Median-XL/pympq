@@ -7,7 +7,7 @@
 #include "mpq.h"
 
 PyDoc_STRVAR(
-    doctsring_method_create_archive,
+    docstring_method_create_archive,
     "create_archive(mpq_filename, create_flags, max_file_count, /) \n--\n\n"
     ":param str mpq_filename: path-like string for the mpq\n"
     ":param list[int] create_flags: list of flags for creation, see pympq constants starting with 'MPQ_CREATE_'\n"
@@ -50,7 +50,7 @@ PyObject* method_create_archive(PyObject* self, PyObject* args) {
 
 static PyMethodDef pympq_method_defs[] = {
 
-    {"create_archive", method_create_archive, METH_VARARGS, doctsring_method_create_archive},
+    {"create_archive", method_create_archive, METH_VARARGS, docstring_method_create_archive},
 
     {nullptr, nullptr, 0, nullptr},
 };

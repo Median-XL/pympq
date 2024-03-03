@@ -11,7 +11,7 @@ typedef struct {
 } MpqObject;
 
 PyDoc_STRVAR(
-    doctsring_method_mpqobj_close,
+    docstring_method_mpqobj_close,
     "close() \n--\n\n"
     ":returns: None\n"
     ":rtype: None\n\n"
@@ -37,7 +37,7 @@ static PyObject* method_mpqobj_ctxmanager_exit(MpqObject* self, PyObject* args) 
 }
 
 PyDoc_STRVAR(
-    doctsring_method_mpqobj_add_file,
+    docstring_method_mpqobj_add_file,
     "add_file(filename, archived_filename, file_flags, compression_flags, compression_flags_next=None /) \n--\n\n"
     ":param str filename: path-like string for the file to add on disk\n"
     ":param str archived_filename: path-like string for the file name in the mpq\n"
@@ -113,7 +113,7 @@ static PyObject* method_mpqobj_add_file(MpqObject* self, PyObject* args) {
 }
 
 PyDoc_STRVAR(
-    doctsring_method_mpqobj_compact,
+    docstring_method_mpqobj_compact,
     "compact(listfile_filename=None /) \n--\n\n"
     ":param str|None listfile_filename: path-like string for the file list, can be None\n"
     ":returns: None\n"
@@ -145,9 +145,9 @@ static PyMethodDef mpqobj_method_defs[] = {
 
     {"__enter__", (PyCFunction)method_mpqobj_ctxmanager_enter, METH_NOARGS, nullptr},
     {"__exit__", (PyCFunction)method_mpqobj_ctxmanager_exit, METH_VARARGS, nullptr},
-    {"close", (PyCFunction)method_mpqobj_close, METH_NOARGS, doctsring_method_mpqobj_close},
-    {"add_file", (PyCFunction)method_mpqobj_add_file, METH_VARARGS, doctsring_method_mpqobj_add_file},
-    {"compact", (PyCFunction)method_mpqobj_compact, METH_VARARGS, doctsring_method_mpqobj_compact},
+    {"close", (PyCFunction)method_mpqobj_close, METH_NOARGS, docstring_method_mpqobj_close},
+    {"add_file", (PyCFunction)method_mpqobj_add_file, METH_VARARGS, docstring_method_mpqobj_add_file},
+    {"compact", (PyCFunction)method_mpqobj_compact, METH_VARARGS, docstring_method_mpqobj_compact},
 
     {nullptr, nullptr, 0, nullptr},
 };
