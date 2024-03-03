@@ -49,7 +49,7 @@ pip install pympq
 ✔️ SFileAddFileEx  
 ❌ SFileAddFile  
 ❌ SFileAddWave  
-❌ SFileRemoveFile  
+✔️ SFileRemoveFile  
 ❌ SFileRenameFile  
 ❌ SFileSetFileLocale  
 ❌ SFileSetDataCompression  
