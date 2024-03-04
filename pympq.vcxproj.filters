@@ -31,7 +31,10 @@
     <ClInclude Include="src/mpq.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\exception.h">
+    <ClInclude Include="src/exception.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src/file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

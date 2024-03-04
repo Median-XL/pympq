@@ -5,6 +5,7 @@
 #include "exception.h"
 #include "constant_alias.h"
 #include "mpq.h"
+#include "file.h"
 
 PyDoc_STRVAR(
     doctsring_method_create_archive,
@@ -47,9 +48,56 @@ PyObject* method_create_archive(PyObject* self, PyObject* args) {
     return (PyObject*)mpq_instance;
 }
 
+PyDoc_STRVAR(
+    docstring_method_open_archive,
+    "open_archive(mpq_filename, flags /) \n--\n\n"
+    ":param str mpq_filename: path-like string for the mpq\n"
+    ":param list[int]|None open_flags: list of flags for creation, see pympq constants starting with 'MPQ_CREATE_'\n"
+    ":returns: Mpq handle object\n"
+    ":rtype: Mpq\n\n"
+    "Implementation of 'SFileOpenArchive'. The returned Mpq object has to be closed by "
+    "calling its .close() method or can be used as a context manager for automatic closing"
+);
+PyObject* method_open_archive(PyObject* self, PyObject* args) {
+
+    char* mpq_filename_arg = nullptr;
+    PyObject* open_flags_arg = Py_None;
+
+    if (!PyArg_ParseTuple(args, "s|O", &mpq_filename_arg, &open_flags_arg)) {
+        return nullptr;
+    }
+
+    wchar_t* mpq_filename = Py_DecodeLocale(mpq_filename_arg, 0);
+    MpqObject* mpq_instance = (MpqObject*)PyObject_CallObject((PyObject*)&MpqObjectType, nullptr);
+
+    unsigned int open_flags = 0;
+    if (open_flags_arg == Py_None) {
+        open_flags = 0;
+    }
+    else {
+        for (int x = 0; x < PyList_Size(open_flags_arg); x++) {
+
+            PyObject* list_item = PyList_GetItem(open_flags_arg, x);
+            long list_item_as_long = PyLong_AsLong(list_item);
+
+            if (unsigned int flag = get_mpq_open_flag_by_alias(list_item_as_long)) {
+                open_flags |= flag;
+            }
+        }
+    }
+
+    // priority is deprecated
+    if (!SFileOpenArchive(mpq_filename, 0, 0, &(mpq_instance->hmpq))) {
+        return PyErr_Format(PympqBaseException, "Failed to open archive, error code: '%d'", GetLastError());
+    }
+
+    return (PyObject*)mpq_instance;
+}
+
 static PyMethodDef pympq_method_defs[] = {
 
     {"create_archive", method_create_archive, METH_VARARGS, doctsring_method_create_archive},
+    {"open_archive", method_open_archive, METH_VARARGS, docstring_method_open_archive},
 
     {nullptr, nullptr, 0, nullptr},
 };
