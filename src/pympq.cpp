@@ -4,8 +4,8 @@
 
 #include "exception.h"
 #include "constant_alias.h"
+#include "mpq_file.h"
 #include "mpq.h"
-#include "file.h"
 
 PyDoc_STRVAR(
     doctsring_method_create_archive,
@@ -52,7 +52,7 @@ PyDoc_STRVAR(
     docstring_method_open_archive,
     "open_archive(mpq_filename, flags /) \n--\n\n"
     ":param str mpq_filename: path-like string for the mpq\n"
-    ":param list[int]|None open_flags: list of flags for creation, see pympq constants starting with 'MPQ_CREATE_'\n"
+    ":param list[int]|None open_flags: list of flags for opening, see pympq constants starting with 'MPQ_OPEN_', 'BASE' and 'STREAM'\n"
     ":returns: Mpq handle object\n"
     ":rtype: Mpq\n\n"
     "Implementation of 'SFileOpenArchive'. The returned Mpq object has to be closed by "
@@ -87,7 +87,7 @@ PyObject* method_open_archive(PyObject* self, PyObject* args) {
     }
 
     // priority is deprecated
-    if (!SFileOpenArchive(mpq_filename, 0, 0, &(mpq_instance->hmpq))) {
+    if (!SFileOpenArchive(mpq_filename, 0, open_flags, &(mpq_instance->hmpq))) {
         return PyErr_Format(PympqBaseException, "Failed to open archive, error code: '%d'", GetLastError());
     }
 
@@ -124,6 +124,12 @@ PyMODINIT_FUNC PyInit_pympq(void) {
         return nullptr;
     }
 
+    if (PyType_Ready(&MpqFileObjectType) < 0) {
+
+        Py_DECREF(pympq_module);
+        return nullptr;
+    }
+
     PyModule_AddIntConstant(pympq_module, "MPQ_CREATE_LISTFILE", ALIAS_MPQ_CREATE_LISTFILE);
     PyModule_AddIntConstant(pympq_module, "MPQ_CREATE_ATTRIBUTES", ALIAS_MPQ_CREATE_ATTRIBUTES);
     PyModule_AddIntConstant(pympq_module, "MPQ_CREATE_SIGNATURE", ALIAS_MPQ_CREATE_SIGNATURE);
@@ -151,6 +157,34 @@ PyMODINIT_FUNC PyInit_pympq(void) {
     PyModule_AddIntConstant(pympq_module, "MPQ_COMPRESSION_LZMA", ALIAS_MPQ_COMPRESSION_LZMA);
     PyModule_AddIntConstant(pympq_module, "MPQ_COMPRESSION_NEXT_SAME", ALIAS_MPQ_COMPRESSION_NEXT_SAME);
 
+    PyModule_AddIntConstant(pympq_module, "BASE_PROVIDER_FILE", ALIAS_BASE_PROVIDER_FILE);
+    PyModule_AddIntConstant(pympq_module, "BASE_PROVIDER_MAP", ALIAS_BASE_PROVIDER_MAP);
+    PyModule_AddIntConstant(pympq_module, "BASE_PROVIDER_HTTP", ALIAS_BASE_PROVIDER_HTTP);
+    PyModule_AddIntConstant(pympq_module, "BASE_PROVIDER_MASK", ALIAS_BASE_PROVIDER_MASK);
+    PyModule_AddIntConstant(pympq_module, "STREAM_PROVIDER_FLAT", ALIAS_STREAM_PROVIDER_FLAT);
+    PyModule_AddIntConstant(pympq_module, "STREAM_PROVIDER_PARTIAL", ALIAS_STREAM_PROVIDER_PARTIAL);
+    PyModule_AddIntConstant(pympq_module, "STREAM_PROVIDER_MPQE", ALIAS_STREAM_PROVIDER_MPQE);
+    PyModule_AddIntConstant(pympq_module, "STREAM_PROVIDER_BLOCK4", ALIAS_STREAM_PROVIDER_BLOCK4);
+    PyModule_AddIntConstant(pympq_module, "STREAM_PROVIDER_MASK", ALIAS_STREAM_PROVIDER_MASK);
+    PyModule_AddIntConstant(pympq_module, "STREAM_FLAG_READ_ONLY", ALIAS_STREAM_FLAG_READ_ONLY);
+    PyModule_AddIntConstant(pympq_module, "STREAM_FLAG_WRITE_SHARE", ALIAS_STREAM_FLAG_WRITE_SHARE);
+    PyModule_AddIntConstant(pympq_module, "STREAM_FLAG_USE_BITMAP", ALIAS_STREAM_FLAG_USE_BITMAP);
+    PyModule_AddIntConstant(pympq_module, "STREAM_OPTIONS_MASK", ALIAS_STREAM_OPTIONS_MASK);
+    PyModule_AddIntConstant(pympq_module, "STREAM_PROVIDERS_MASK", ALIAS_STREAM_PROVIDERS_MASK);
+    PyModule_AddIntConstant(pympq_module, "STREAM_FLAGS_MASK", ALIAS_STREAM_FLAGS_MASK);
+    PyModule_AddIntConstant(pympq_module, "MPQ_OPEN_NO_LISTFILE", ALIAS_MPQ_OPEN_NO_LISTFILE);
+    PyModule_AddIntConstant(pympq_module, "MPQ_OPEN_NO_ATTRIBUTES", ALIAS_MPQ_OPEN_NO_ATTRIBUTES);
+    PyModule_AddIntConstant(pympq_module, "MPQ_OPEN_NO_HEADER_SEARCH", ALIAS_MPQ_OPEN_NO_HEADER_SEARCH);
+    PyModule_AddIntConstant(pympq_module, "MPQ_OPEN_FORCE_MPQ_V1", ALIAS_MPQ_OPEN_FORCE_MPQ_V1);
+    PyModule_AddIntConstant(pympq_module, "MPQ_OPEN_CHECK_SECTOR_CRC", ALIAS_MPQ_OPEN_CHECK_SECTOR_CRC);
+    PyModule_AddIntConstant(pympq_module, "MPQ_OPEN_PATCH", ALIAS_MPQ_OPEN_PATCH);
+    PyModule_AddIntConstant(pympq_module, "MPQ_OPEN_FORCE_LISTFILE", ALIAS_MPQ_OPEN_FORCE_LISTFILE);
+    PyModule_AddIntConstant(pympq_module, "MPQ_OPEN_READ_ONLY", ALIAS_MPQ_OPEN_READ_ONLY);
+
+    PyModule_AddIntConstant(pympq_module, "SFILE_OPEN_FROM_MPQ", ALIAS_SFILE_OPEN_FROM_MPQ);
+    PyModule_AddIntConstant(pympq_module, "SFILE_OPEN_CHECK_EXISTS", ALIAS_SFILE_OPEN_CHECK_EXISTS);
+    PyModule_AddIntConstant(pympq_module, "SFILE_OPEN_FROM_LOCAL_FILE", ALIAS_SFILE_OPEN_LOCAL_FILE);
+
     PympqBaseException = PyErr_NewException("pympq.MpqException", PyExc_Exception, nullptr);
     PyModule_AddObject(pympq_module, "MpqException", PympqBaseException);
 
@@ -158,6 +192,15 @@ PyMODINIT_FUNC PyInit_pympq(void) {
     if (PyModule_AddObject(pympq_module, "Mpq", (PyObject*)&MpqObjectType) < 0) {
 
         Py_DECREF(&MpqObjectType);
+        Py_DECREF(pympq_module);
+
+        return nullptr;
+    }
+
+    Py_INCREF(&MpqFileObjectType);
+    if (PyModule_AddObject(pympq_module, "File", (PyObject*)&MpqFileObjectType) < 0) {
+
+        Py_DECREF(&MpqFileObjectType);
         Py_DECREF(pympq_module);
 
         return nullptr;

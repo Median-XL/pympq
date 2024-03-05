@@ -8,7 +8,7 @@ typedef struct {
     PyObject_HEAD
     HANDLE hFile;
 
-} FileObject;
+} MpqFileObject;
 
 PyDoc_STRVAR(
     docstring_method_fileobj_close,
@@ -17,7 +17,7 @@ PyDoc_STRVAR(
     ":rtype: None\n\n"
     "Implementation of 'SFileCloseFile'. Closes an opened File handle object."
 );
-static PyObject* method_fileobj_close(FileObject* self, PyObject* args) {
+static PyObject* method_fileobj_close(MpqFileObject* self, PyObject* args) {
 
     if (!SFileCloseFile(self->hFile)) {
         return PyErr_Format(PympqBaseException, "Failed to close file, error code: '%d'", GetLastError());
@@ -26,14 +26,32 @@ static PyObject* method_fileobj_close(FileObject* self, PyObject* args) {
     Py_RETURN_NONE;
 }
 
-static PyObject* method_fileobj_ctxmanager_enter(FileObject* self, PyObject* args) {
+static PyObject* method_fileobj_ctxmanager_enter(MpqFileObject* self, PyObject* args) {
 
     Py_XINCREF(self);
     return (PyObject*)self;
 }
 
-static PyObject* method_fileobj_ctxmanager_exit(FileObject* self, PyObject* args) {
+static PyObject* method_fileobj_ctxmanager_exit(MpqFileObject* self, PyObject* args) {
     return method_fileobj_close(self, args);
+}
+
+
+PyDoc_STRVAR(
+    docstring_method_fileobj_get_name,
+    "get_name() \n--\n\n"
+    ":returns: Name of file\n"
+    ":rtype: Str\n\n"
+    "Implementation of 'SFileGetFileName'. Gets name of file handle object."
+);
+static PyObject* method_fileobj_get_name(MpqFileObject* self, PyObject* args) {
+
+    char buffer[MAX_PATH];
+    if (!SFileGetFileName(self->hFile, buffer)) {
+        return PyErr_Format(PympqBaseException, "Failed to get file name, error code: '%d'", GetLastError());
+    }
+
+    return PyUnicode_FromString(buffer);
 }
 
 static PyMethodDef fileobj_method_defs[] = {
@@ -41,12 +59,13 @@ static PyMethodDef fileobj_method_defs[] = {
     {"__enter__", (PyCFunction)method_fileobj_ctxmanager_enter, METH_NOARGS, nullptr},
     {"__exit__", (PyCFunction)method_fileobj_ctxmanager_exit, METH_VARARGS, nullptr},
     {"close", (PyCFunction)method_fileobj_close, METH_NOARGS, docstring_method_fileobj_close},
+    {"get_name", (PyCFunction)method_fileobj_get_name, METH_NOARGS, docstring_method_fileobj_get_name},
 };
 
-static PyTypeObject FileObjectType = {
+static PyTypeObject MpqFileObjectType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "pympq.File",                   /* tp_name */
-    sizeof(FileObject),             /* tp_basicsize */
+    "pympq.MpqFile",                   /* tp_name */
+    sizeof(MpqFileObject),             /* tp_basicsize */
     0,                              /* tp_itemsize */
     0,                              /* tp_dealloc */
     0,                              /* tp_vectorcall_offset */

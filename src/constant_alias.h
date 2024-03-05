@@ -176,4 +176,21 @@ unsigned int get_mpq_open_flag_by_alias(long alias) {
 
 }
 
+#define ALIAS_SFILE_OPEN_FROM_MPQ 1
+#define ALIAS_SFILE_OPEN_CHECK_EXISTS 2
+#define ALIAS_SFILE_OPEN_LOCAL_FILE 3
+
+signed int get_file_open_flag_by_alias(int alias) {
+    
+    if (alias == ALIAS_SFILE_OPEN_CHECK_EXISTS) {
+        return SFILE_OPEN_CHECK_EXISTS;
+    }
+    else if (alias == ALIAS_SFILE_OPEN_LOCAL_FILE) {
+        return SFILE_OPEN_LOCAL_FILE;
+    }
+    else {
+        return SFILE_OPEN_FROM_MPQ;
+    }
+}
+
 #endif

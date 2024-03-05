@@ -27,9 +27,9 @@ pip install pympq
 ❌ SFileGetFileSize  
 ❌ SFileSetFilePointer  
 ❌ SFileReadFile  
-❌ SFileCloseFile  
+✔️ SFileCloseFile
 ✔️ SFileHasFile
-❌ SFileGetFileName  
+✔️ SFileGetFileName
 ❌ SFileGetFileInfo  
 ❌ SFileVerifyFile  
 ❌ SFileVerifyArchive  
