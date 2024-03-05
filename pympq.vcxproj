@@ -214,7 +214,7 @@
     <ClInclude Include="src/constant_alias.h" />
     <ClInclude Include="src/mpq.h" />
     <ClInclude Include="src/exception.h" />
-    <ClInclude Include="src/file.h" />
+    <ClInclude Include="src/mpq_file.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
