@@ -23,13 +23,13 @@ pip install pympq
 ❌ SFileOpenPatchArchive  
 ❌ SFileIsPatchedArchive  
 
-❌ SFileOpenFileEx  
+✔️ SFileOpenFileEx  
 ❌ SFileGetFileSize  
 ❌ SFileSetFilePointer  
 ❌ SFileReadFile  
-✔️ SFileCloseFile
-✔️ SFileHasFile
-✔️ SFileGetFileName
+✔️ SFileCloseFile  
+✔️ SFileHasFile  
+✔️ SFileGetFileName  
 ❌ SFileGetFileInfo  
 ❌ SFileVerifyFile  
 ❌ SFileVerifyArchive  
