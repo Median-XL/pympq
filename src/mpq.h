@@ -138,6 +138,59 @@ static PyObject* method_mpqobj_remove_file(MpqObject* self, PyObject* args) {
 }
 
 PyDoc_STRVAR(
+    docstring_method_mpqobj_has_file,
+    "has_file(filename /) \n--\n\n"
+    ":param str filename: path-like string for the in-mpq filename to remove\n"
+    ":returns: True or False\n"
+    ":rtype: bool\n\n"
+    "Implementation of 'SFileHasFile'. Checks for whether a file is in the mpq handle object."
+);
+static PyObject* method_mpqobj_has_file(MpqObject* self, PyObject* args) {
+
+    char* filename_arg = nullptr;
+
+    if (!PyArg_ParseTuple(args, "s", &filename_arg)) {
+        return nullptr;
+    }
+
+    if (SFileHasFile(self->hmpq, filename_arg)) {
+        return Py_True;
+    }
+    else {
+        return Py_False;
+    }
+}
+
+PyDoc_STRVAR(
+    docstring_method_mpqobj_open_file,
+    "open_file(filename, search_scope /) \n--\n\n"
+    ":param str filename: path-like string for the in-mpq filename to open\n"
+    ":param int|None search_scope: Where the file to be opened should be searched from, see pympq constants starting with 'SFILE_OPEN_, defaults MPQ'\n"
+    ":returns: File handle object\n"
+    ":rtype: File\n\n"
+    "Implementation of 'SFileOpenFileEx'."
+);
+static PyObject* method_mpqobj_open_file(MpqObject* self, PyObject* args) {
+
+    char* filename_arg = nullptr;
+    int search_scope_arg = 0;
+
+    if (!PyArg_ParseTuple(args, "s|I", &filename_arg, &search_scope_arg)) {
+        return nullptr;
+    }
+    
+    MpqFileObject* file_instance = (MpqFileObject*)PyObject_CallObject((PyObject*)&MpqFileObjectType, nullptr);
+
+    signed int search_scope = get_file_open_flag_by_alias(search_scope_arg);
+
+    if (!SFileOpenFileEx(self->hmpq, filename_arg, search_scope, &(file_instance->hFile))) {
+        return PyErr_Format(PympqBaseException, "Failed to open file, error code: '%d'", GetLastError());
+    }
+
+    return (PyObject*)file_instance;
+}
+
+PyDoc_STRVAR(
     docstring_method_mpqobj_compact,
     "compact(listfile_filename=None /) \n--\n\n"
     ":param str|None listfile_filename: path-like string for the file list, can be None\n"
@@ -173,6 +226,8 @@ static PyMethodDef mpqobj_method_defs[] = {
     {"close", (PyCFunction)method_mpqobj_close, METH_NOARGS, docstring_method_mpqobj_close},
     {"add_file", (PyCFunction)method_mpqobj_add_file, METH_VARARGS, docstring_method_mpqobj_add_file},
     {"remove_file", (PyCFunction)method_mpqobj_remove_file, METH_VARARGS, docstring_method_mpqobj_remove_file},
+    {"has_file", (PyCFunction)method_mpqobj_has_file, METH_VARARGS, docstring_method_mpqobj_has_file},
+    {"open_file", (PyCFunction)method_mpqobj_open_file, METH_VARARGS, docstring_method_mpqobj_open_file},
     {"compact", (PyCFunction)method_mpqobj_compact, METH_VARARGS, docstring_method_mpqobj_compact},
 
     {nullptr, nullptr, 0, nullptr},

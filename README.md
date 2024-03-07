@@ -7,7 +7,7 @@ pip install pympq
 ```
 
 ## API Implementation Coverage
-❌ SFileOpenArchive  
+✔️ SFileOpenArchive  
 ✔️ SFileCreateArchive  
 ❌ SFileCreateArchive2  
 ❌ SFileAddListFile  
@@ -23,13 +23,13 @@ pip install pympq
 ❌ SFileOpenPatchArchive  
 ❌ SFileIsPatchedArchive  
 
-❌ SFileOpenFileEx  
+✔️ SFileOpenFileEx  
 ❌ SFileGetFileSize  
 ❌ SFileSetFilePointer  
 ❌ SFileReadFile  
-❌ SFileCloseFile  
-❌ SFileHasFile  
-❌ SFileGetFileName  
+✔️ SFileCloseFile  
+✔️ SFileHasFile  
+✔️ SFileGetFileName  
 ❌ SFileGetFileInfo  
 ❌ SFileVerifyFile  
 ❌ SFileVerifyArchive  
