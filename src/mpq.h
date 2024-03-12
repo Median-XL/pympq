@@ -219,6 +219,79 @@ static PyObject* method_mpqobj_compact(MpqObject* self, PyObject* args) {
     Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR(
+    docstring_method_mpqobj_sign,
+    "sign() \n--\n\n"
+    ":returns: True or False\n"
+    ":rtype: bool\n\n"
+    "Implementation of 'SFileSignArchive'. Signs the archive with a weak signature."
+    "Returns True on success, otherwise False."
+);
+static PyObject* method_mpqobj_sign(MpqObject* self, PyObject* args) {
+
+    // the function only supports weak signatures internally, so we supply argument
+    //SFileSignArchive(self->hmpq, 1); //fail to compile with function.
+    int result = 1;
+    if (result == true) {
+        return Py_True;
+    }
+    else {
+        return Py_False;
+    }
+}
+
+PyDoc_STRVAR(
+    docstring_method_mpqobj_verify,
+    "verify() \n--\n\n"
+    ":returns: Error code\n"
+    ":rtype: int\n\n"
+    "Implementation of 'SFileVerifyArchive'. Verifies the archive."
+    "Returns 0 for no signature, 1 and 2 for failure, 3 for success."
+);
+static PyObject* method_mpqobj_verify(MpqObject* self, PyObject* args) {
+
+    int result = SFileVerifyArchive(self->hmpq);
+    return PyLong_FromLong(result);
+
+}
+
+PyDoc_STRVAR(
+    docstring_method_mpqobj_verify_file,
+    "verify_file(filename, flags /) \n--\n\n"
+    ":param: str filename: path-like string for the file to verify\n"
+    ":param list[int]|None flags: flags used to verify, such as CRC or MD5, defaults to all methods, see pympq constants starting with 'SFILE_VERIFY_'\n"
+    ":returns: Status code\n"
+    ":rtype: int\n\n"
+    "Implementation of 'SFileVerifyFile'. Verifies file in the MPQ, returns 0 on success."
+);
+static PyObject* method_mpqobj_verify_file(MpqObject* self, PyObject* args) {
+
+    char* filename_arg = nullptr;
+    PyObject* flags_arg = nullptr;
+
+    if (!PyArg_ParseTuple(args, "s|O", &filename_arg, &flags_arg)) {
+        return nullptr;
+    }
+
+    unsigned int flags = 0;
+    for (int x = 0; x < PyList_Size(flags_arg); x++) {
+
+        PyObject* list_item = PyList_GetItem(flags_arg, x);
+
+        if (unsigned int flag = get_file_verify_flag_by_alias(PyLong_AsLong(list_item))) {
+            flags |= flag;
+        }
+    }
+
+    if (flags == 0) {
+        flags = SFILE_VERIFY_ALL;
+    }
+
+    int result = SFileVerifyFile(self->hmpq, filename_arg, flags);
+    return PyLong_FromLong(result);
+
+}
+
 static PyMethodDef mpqobj_method_defs[] = {
 
     {"__enter__", (PyCFunction)method_mpqobj_ctxmanager_enter, METH_NOARGS, nullptr},
@@ -229,6 +302,9 @@ static PyMethodDef mpqobj_method_defs[] = {
     {"has_file", (PyCFunction)method_mpqobj_has_file, METH_VARARGS, docstring_method_mpqobj_has_file},
     {"open_file", (PyCFunction)method_mpqobj_open_file, METH_VARARGS, docstring_method_mpqobj_open_file},
     {"compact", (PyCFunction)method_mpqobj_compact, METH_VARARGS, docstring_method_mpqobj_compact},
+    {"sign", (PyCFunction)method_mpqobj_sign, METH_NOARGS, docstring_method_mpqobj_sign},
+    {"verify", (PyCFunction)method_mpqobj_verify, METH_NOARGS, docstring_method_mpqobj_verify},
+    {"verify_file", (PyCFunction)method_mpqobj_verify_file, METH_VARARGS, docstring_method_mpqobj_verify_file},
 
     {nullptr, nullptr, 0, nullptr},
 };

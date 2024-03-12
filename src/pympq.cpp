@@ -185,6 +185,12 @@ PyMODINIT_FUNC PyInit_pympq(void) {
     PyModule_AddIntConstant(pympq_module, "SFILE_OPEN_CHECK_EXISTS", ALIAS_SFILE_OPEN_CHECK_EXISTS);
     PyModule_AddIntConstant(pympq_module, "SFILE_OPEN_FROM_LOCAL_FILE", ALIAS_SFILE_OPEN_LOCAL_FILE);
 
+    PyModule_AddIntConstant(pympq_module, "SFILE_VERIFY_SECTOR_CRC", ALIAS_SFILE_VERIFY_SECTOR_CRC);
+    PyModule_AddIntConstant(pympq_module, "SFILE_VERIFY_FILE_CRC", ALIAS_SFILE_VERIFY_FILE_CRC);
+    PyModule_AddIntConstant(pympq_module, "SFILE_VERIFY_FILE_MD5", ALIAS_SFILE_VERIFY_FILE_MD5);
+    PyModule_AddIntConstant(pympq_module, "SFILE_VERIFY_RAW_MD5", ALIAS_SFILE_VERIFY_RAW_MD5);
+    PyModule_AddIntConstant(pympq_module, "SFILE_VERIFY_ALL", ALIAS_SFILE_VERIFY_ALL);
+
     PympqBaseException = PyErr_NewException("pympq.MpqException", PyExc_Exception, nullptr);
     PyModule_AddObject(pympq_module, "MpqException", PympqBaseException);
 
