@@ -292,6 +292,63 @@ static PyObject* method_mpqobj_verify_file(MpqObject* self, PyObject* args) {
 
 }
 
+PyDoc_STRVAR(
+    docstring_method_mpqobj_rename_file,
+    "rename_file(old_filename, new_filename /) \n--\n\n"
+    ":param: str old_filename: path-like string for the file to rename\n"
+    ":param: str new_filename: path-like string for the new file name\n"
+    ":returns: None\n"
+    ":rtype: None\n\n"
+    "Implementation of 'SFileRenameFile'. Renames file in the MPQ."
+);
+static PyObject* method_mpqobj_rename_file(MpqObject* self, PyObject* args) {
+
+    char* old_filename_arg = nullptr;
+    char* new_filename_arg = nullptr;
+
+    if (!PyArg_ParseTuple(args, "ss", &old_filename_arg, &new_filename_arg)) {
+        return nullptr;
+    }
+
+    if (!SFileRenameFile(self->hmpq, old_filename_arg, new_filename_arg)) {
+        return PyErr_Format(PympqBaseException, "Failed to rename file, error code: '%d'", GetLastError());
+    }
+
+    Py_RETURN_NONE;
+
+}
+
+PyDoc_STRVAR(
+    docstring_method_mpqobj_extract_file,
+    "rename_file(extract_filename, extracted_filename, search_scope /) \n--\n\n"
+    ":param: str extract_filename: path-like string for the file to extract\n"
+    ":param: str extracted_filename: path-like string for the extracted file\n"
+    ":param int|None search_scope: Where the file to be extracted should be searched from, see pympq constants starting with 'SFILE_OPEN_, defaults MPQ'\n"
+    ":returns: None\n"
+    ":rtype: None\n\n"
+    "Implementation of 'SFileExtractFile'. Extracts file from the MPQ."
+);
+static PyObject* method_mpqobj_extract_file(MpqObject* self, PyObject* args) {
+
+    char* extract_filename_arg = nullptr;
+    char* extracted_filename_arg = nullptr;
+    int search_scope_arg = 0;
+
+    signed int search_scope = get_file_open_flag_by_alias(search_scope_arg);
+
+    if (!PyArg_ParseTuple(args, "ss|I", &extract_filename_arg, &extracted_filename_arg, &search_scope_arg)) {
+        return nullptr;
+    }
+
+    wchar_t* extracted_filename = Py_DecodeLocale(extracted_filename_arg, 0);
+
+    if (!SFileExtractFile(self->hmpq, extract_filename_arg, extracted_filename, search_scope_arg)) {
+        return PyErr_Format(PympqBaseException, "Failed to extract file, error code: '%d'", GetLastError());
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef mpqobj_method_defs[] = {
 
     {"__enter__", (PyCFunction)method_mpqobj_ctxmanager_enter, METH_NOARGS, nullptr},
@@ -305,6 +362,8 @@ static PyMethodDef mpqobj_method_defs[] = {
     {"sign", (PyCFunction)method_mpqobj_sign, METH_NOARGS, docstring_method_mpqobj_sign},
     {"verify", (PyCFunction)method_mpqobj_verify, METH_NOARGS, docstring_method_mpqobj_verify},
     {"verify_file", (PyCFunction)method_mpqobj_verify_file, METH_VARARGS, docstring_method_mpqobj_verify_file},
+    {"rename_file", (PyCFunction)method_mpqobj_rename_file, METH_VARARGS, docstring_method_mpqobj_rename_file},
+    {"extract_file", (PyCFunction)method_mpqobj_extract_file, METH_VARARGS, docstring_method_mpqobj_extract_file},
 
     {nullptr, nullptr, 0, nullptr},
 };

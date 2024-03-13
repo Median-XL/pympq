@@ -33,7 +33,7 @@ pip install pympq
 ❌ SFileGetFileInfo  
 ✔️ SFileVerifyFile  
 ❌ SFileVerifyArchive  
-❌ SFileExtractFile  
+✔️ SFileExtractFile  
 
 ❌ SFileFindFirstFile  
 ❌ SFileFindNextFile  
@@ -47,12 +47,10 @@ pip install pympq
 ❌ SFileWriteFile  
 ❌ SFileFinishFile  
 ✔️ SFileAddFileEx  
-❌ SFileAddFile  
 ❌ SFileAddWave  
 ✔️ SFileRemoveFile  
-❌ SFileRenameFile  
+✔️ SFileRenameFile  
 ❌ SFileSetFileLocale  
-❌ SFileSetDataCompression  
 ❌ SFileSetAddFileCallback  
 
 ❌ SCompImplode  
