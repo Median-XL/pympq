@@ -54,12 +54,26 @@ static PyObject* method_fileobj_get_name(MpqFileObject* self, PyObject* args) {
     return PyUnicode_FromString(buffer);
 }
 
+PyDoc_STRVAR(
+    docstring_method_fileobj_get_size,
+    "get_size() \n--\n\n"
+    ":returns: Size of file in bytes\n"
+    ":rtype: int\n\n"
+    "Implementation of 'SFileGetFileSize'. Gets size of file."
+);
+static PyObject* method_fileobj_get_size(MpqFileObject* self, PyObject* args) {
+
+    int result = SFileGetFileSize(self->hFile, 0);
+    return PyLong_FromLong(result);
+}
+
 static PyMethodDef fileobj_method_defs[] = {
 
     {"__enter__", (PyCFunction)method_fileobj_ctxmanager_enter, METH_NOARGS, nullptr},
     {"__exit__", (PyCFunction)method_fileobj_ctxmanager_exit, METH_VARARGS, nullptr},
     {"close", (PyCFunction)method_fileobj_close, METH_NOARGS, docstring_method_fileobj_close},
     {"get_name", (PyCFunction)method_fileobj_get_name, METH_NOARGS, docstring_method_fileobj_get_name},
+    {"get_size", (PyCFunction)method_fileobj_get_size, METH_NOARGS, docstring_method_fileobj_get_size},
 };
 
 static PyTypeObject MpqFileObjectType = {

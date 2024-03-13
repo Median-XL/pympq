@@ -274,17 +274,18 @@ static PyObject* method_mpqobj_verify_file(MpqObject* self, PyObject* args) {
     }
 
     unsigned int flags = 0;
-    for (int x = 0; x < PyList_Size(flags_arg); x++) {
-
-        PyObject* list_item = PyList_GetItem(flags_arg, x);
-
-        if (unsigned int flag = get_file_verify_flag_by_alias(PyLong_AsLong(list_item))) {
-            flags |= flag;
-        }
-    }
-
-    if (flags == 0) {
+    if (flags_arg == nullptr) {
         flags = SFILE_VERIFY_ALL;
+    }
+    else {
+        for (int x = 0; x < PyList_Size(flags_arg); x++) {
+
+            PyObject* list_item = PyList_GetItem(flags_arg, x);
+
+            if (unsigned int flag = get_file_verify_flag_by_alias(PyLong_AsLong(list_item))) {
+                flags |= flag;
+            }
+        }
     }
 
     int result = SFileVerifyFile(self->hmpq, filename_arg, flags);
@@ -349,6 +350,44 @@ static PyObject* method_mpqobj_extract_file(MpqObject* self, PyObject* args) {
     Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR(
+    docstring_method_mpqobj_get_max_file_count,
+    "get_max_file_count() \n--\n\n"
+    ":returns: Max file count of the MPQ\n"
+    ":rtype: int\n\n"
+    "Implementation of 'SFileGetMaxFileCount'. Gets the max file count of the MPQ."
+);
+static PyObject* method_mpqobj_get_max_file_count(MpqObject* self, PyObject* args) {
+
+    int file_count = SFileGetMaxFileCount(self->hmpq);
+
+    return PyLong_FromLong(file_count);
+}
+
+PyDoc_STRVAR(
+    docstring_method_mpqobj_set_max_file_count,
+    "set_max_file_count(max_file_count /) \n--\n\n"
+    ":param int max_file_count: maximum number of files. Must be between HASH_TABLE_SIZE_MIN and HASH_TABLE_SIZE_MAX\n"
+    ":returns: None\n"
+    ":rtype: None\n\n"
+    "Implementation of 'SFileSetMaxFileCount'. Sets the max file count of the MPQ."
+);
+static PyObject* method_mpqobj_set_max_file_count(MpqObject* self, PyObject* args) {
+
+    unsigned int max_file_count_arg = 0;
+
+    if (!PyArg_ParseTuple(args, "I", &max_file_count_arg)) {
+        return nullptr;
+    }
+
+    if (!SFileSetMaxFileCount(self->hmpq, max_file_count_arg)) {
+        return PyErr_Format(PympqBaseException, "Failed to set max file count, error code: '%d'", GetLastError());
+    }
+
+    Py_RETURN_NONE;
+
+}
+
 static PyMethodDef mpqobj_method_defs[] = {
 
     {"__enter__", (PyCFunction)method_mpqobj_ctxmanager_enter, METH_NOARGS, nullptr},
@@ -364,6 +403,8 @@ static PyMethodDef mpqobj_method_defs[] = {
     {"verify_file", (PyCFunction)method_mpqobj_verify_file, METH_VARARGS, docstring_method_mpqobj_verify_file},
     {"rename_file", (PyCFunction)method_mpqobj_rename_file, METH_VARARGS, docstring_method_mpqobj_rename_file},
     {"extract_file", (PyCFunction)method_mpqobj_extract_file, METH_VARARGS, docstring_method_mpqobj_extract_file},
+    {"get_max_file_count", (PyCFunction)method_mpqobj_get_max_file_count, METH_NOARGS, docstring_method_mpqobj_get_max_file_count},
+    {"set_max_file_count", (PyCFunction)method_mpqobj_set_max_file_count, METH_VARARGS, docstring_method_mpqobj_set_max_file_count},
 
     {nullptr, nullptr, 0, nullptr},
 };
