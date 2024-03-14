@@ -388,6 +388,31 @@ static PyObject* method_mpqobj_set_max_file_count(MpqObject* self, PyObject* arg
 
 }
 
+PyDoc_STRVAR(
+    docstring_method_mpqobj_add_listfile,
+    "add_listfile(listfile_name /) \n--\n\n"
+    ":param str listfile_name: path-like string for the listfile to be added"
+    ":returns: None\n"
+    ":rtype: None\n\n"
+    "Implementation of 'SFileAddListFile'. Adds a listfile to the MPQ."
+);
+static PyObject* method_mpqobj_add_listfile(MpqObject* self, PyObject* args) {
+
+    char* listfile_name_arg = nullptr;
+
+    if (!PyArg_ParseTuple(args, "s", &listfile_name_arg)) {
+        return nullptr;
+    }
+
+    wchar_t* listfile_name = Py_DecodeLocale(listfile_name_arg, 0);
+
+    if (SFileAddListFile(self->hmpq, listfile_name)) {
+        return PyErr_Format(PympqBaseException, "Failed to add a listfile to the MPQ, error code: '%d'", GetLastError());
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef mpqobj_method_defs[] = {
 
     {"__enter__", (PyCFunction)method_mpqobj_ctxmanager_enter, METH_NOARGS, nullptr},
@@ -405,6 +430,7 @@ static PyMethodDef mpqobj_method_defs[] = {
     {"extract_file", (PyCFunction)method_mpqobj_extract_file, METH_VARARGS, docstring_method_mpqobj_extract_file},
     {"get_max_file_count", (PyCFunction)method_mpqobj_get_max_file_count, METH_NOARGS, docstring_method_mpqobj_get_max_file_count},
     {"set_max_file_count", (PyCFunction)method_mpqobj_set_max_file_count, METH_VARARGS, docstring_method_mpqobj_set_max_file_count},
+    {"add_listfile", (PyCFunction)method_mpqobj_add_listfile, METH_VARARGS, docstring_method_mpqobj_add_listfile},
 
     {nullptr, nullptr, 0, nullptr},
 };

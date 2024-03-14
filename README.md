@@ -10,7 +10,7 @@ pip install pympq
 ✔️ SFileOpenArchive  
 ✔️ SFileCreateArchive  
 ❌ SFileCreateArchive2  
-❌ SFileAddListFile  
+✔️ SFileAddListFile  
 ❌ SFileSetLocale  
 ❌ SFileGetLocale  
 ❌ SFileFlushArchive  
