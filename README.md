@@ -10,13 +10,14 @@ pip install pympq
 ✔️ SFileOpenArchive  
 ✔️ SFileCreateArchive  
 ❌ SFileCreateArchive2  
-❌ SFileAddListFile  
+✔️ SFileAddListFile  
 ❌ SFileSetLocale  
 ❌ SFileGetLocale  
 ❌ SFileFlushArchive  
 ✔️ SFileCloseArchive  
-❌ SFileSetMaxFileCount  
-❌ SFileSignArchive  
+✔️ SFileGetMaxFileCount  
+✔️ SFileSetMaxFileCount  
+❌ SFileSignArchive **Bugged**  
 ✔️ SFileCompactArchive  
 ❌ SFileSetCompactCallback  
 
@@ -24,16 +25,16 @@ pip install pympq
 ❌ SFileIsPatchedArchive  
 
 ✔️ SFileOpenFileEx  
-❌ SFileGetFileSize  
+✔️ SFileGetFileSize  
 ❌ SFileSetFilePointer  
 ❌ SFileReadFile  
 ✔️ SFileCloseFile  
 ✔️ SFileHasFile  
 ✔️ SFileGetFileName  
 ❌ SFileGetFileInfo  
-❌ SFileVerifyFile  
+✔️ SFileVerifyFile  
 ❌ SFileVerifyArchive  
-❌ SFileExtractFile  
+✔️ SFileExtractFile  
 
 ❌ SFileFindFirstFile  
 ❌ SFileFindNextFile  
@@ -47,12 +48,9 @@ pip install pympq
 ❌ SFileWriteFile  
 ❌ SFileFinishFile  
 ✔️ SFileAddFileEx  
-❌ SFileAddFile  
-❌ SFileAddWave  
 ✔️ SFileRemoveFile  
-❌ SFileRenameFile  
+✔️ SFileRenameFile  
 ❌ SFileSetFileLocale  
-❌ SFileSetDataCompression  
 ❌ SFileSetAddFileCallback  
 
 ❌ SCompImplode  

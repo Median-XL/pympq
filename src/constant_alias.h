@@ -193,4 +193,24 @@ signed int get_file_open_flag_by_alias(int alias) {
     }
 }
 
+#define ALIAS_SFILE_VERIFY_SECTOR_CRC     1
+#define ALIAS_SFILE_VERIFY_FILE_CRC       2
+#define ALIAS_SFILE_VERIFY_FILE_MD5       3
+#define ALIAS_SFILE_VERIFY_RAW_MD5        4
+#define ALIAS_SFILE_VERIFY_ALL            5
+
+signed int get_file_verify_flag_by_alias(int alias) {
+
+    switch (alias) {
+    case ALIAS_SFILE_VERIFY_SECTOR_CRC: return SFILE_VERIFY_SECTOR_CRC;
+    case ALIAS_SFILE_VERIFY_FILE_CRC: return SFILE_VERIFY_FILE_CRC;
+    case ALIAS_SFILE_VERIFY_FILE_MD5: return SFILE_VERIFY_FILE_MD5;
+    case ALIAS_SFILE_VERIFY_RAW_MD5: return SFILE_VERIFY_RAW_MD5;
+    case ALIAS_SFILE_VERIFY_ALL: return SFILE_VERIFY_ALL;
+    default: return 0;
+    }
+
+}
+
+
 #endif

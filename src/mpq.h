@@ -219,6 +219,179 @@ static PyObject* method_mpqobj_compact(MpqObject* self, PyObject* args) {
     Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR(
+    docstring_method_mpqobj_verify,
+    "verify() \n--\n\n"
+    ":returns: Error code\n"
+    ":rtype: int\n\n"
+    "Implementation of 'SFileVerifyArchive'. Verifies the archive."
+    "Returns 0 for no signature, 1 and 2 for failure, 3 for success."
+);
+static PyObject* method_mpqobj_verify(MpqObject* self, PyObject* args) {
+
+    int result = SFileVerifyArchive(self->hmpq);
+    return PyLong_FromLong(result);
+
+}
+
+PyDoc_STRVAR(
+    docstring_method_mpqobj_verify_file,
+    "verify_file(filename, flags /) \n--\n\n"
+    ":param: str filename: path-like string for the file to verify\n"
+    ":param list[int]|None flags: flags used to verify, such as CRC or MD5, defaults to all methods, see pympq constants starting with 'SFILE_VERIFY_'\n"
+    ":returns: Status code\n"
+    ":rtype: int\n\n"
+    "Implementation of 'SFileVerifyFile'. Verifies file in the MPQ, returns 0 on success."
+);
+static PyObject* method_mpqobj_verify_file(MpqObject* self, PyObject* args) {
+
+    char* filename_arg = nullptr;
+    PyObject* flags_arg = nullptr;
+
+    if (!PyArg_ParseTuple(args, "s|O", &filename_arg, &flags_arg)) {
+        return nullptr;
+    }
+
+    unsigned int flags = 0;
+    if (flags_arg == nullptr) {
+        flags = SFILE_VERIFY_ALL;
+    }
+    else {
+        for (int x = 0; x < PyList_Size(flags_arg); x++) {
+
+            PyObject* list_item = PyList_GetItem(flags_arg, x);
+
+            if (unsigned int flag = get_file_verify_flag_by_alias(PyLong_AsLong(list_item))) {
+                flags |= flag;
+            }
+        }
+    }
+
+    int result = SFileVerifyFile(self->hmpq, filename_arg, flags);
+    return PyLong_FromLong(result);
+
+}
+
+PyDoc_STRVAR(
+    docstring_method_mpqobj_rename_file,
+    "rename_file(old_filename, new_filename /) \n--\n\n"
+    ":param: str old_filename: path-like string for the file to rename\n"
+    ":param: str new_filename: path-like string for the new file name\n"
+    ":returns: None\n"
+    ":rtype: None\n\n"
+    "Implementation of 'SFileRenameFile'. Renames file in the MPQ."
+);
+static PyObject* method_mpqobj_rename_file(MpqObject* self, PyObject* args) {
+
+    char* old_filename_arg = nullptr;
+    char* new_filename_arg = nullptr;
+
+    if (!PyArg_ParseTuple(args, "ss", &old_filename_arg, &new_filename_arg)) {
+        return nullptr;
+    }
+
+    if (!SFileRenameFile(self->hmpq, old_filename_arg, new_filename_arg)) {
+        return PyErr_Format(PympqBaseException, "Failed to rename file, error code: '%d'", GetLastError());
+    }
+
+    Py_RETURN_NONE;
+
+}
+
+PyDoc_STRVAR(
+    docstring_method_mpqobj_extract_file,
+    "extract_file(extract_filename, extracted_filename, search_scope=None /) \n--\n\n"
+    ":param: str extract_filename: path-like string for the file to extract\n"
+    ":param: str extracted_filename: path-like string for the extracted file\n"
+    ":param int|None search_scope: Where the file to be extracted should be searched from, see pympq constants starting with 'SFILE_OPEN_, defaults MPQ'\n"
+    ":returns: None\n"
+    ":rtype: None\n\n"
+    "Implementation of 'SFileExtractFile'. Extracts file from the MPQ."
+);
+static PyObject* method_mpqobj_extract_file(MpqObject* self, PyObject* args) {
+
+    char* extract_filename_arg = nullptr;
+    char* extracted_filename_arg = nullptr;
+    int search_scope_arg = 0;
+
+    if (!PyArg_ParseTuple(args, "ss|I", &extract_filename_arg, &extracted_filename_arg, &search_scope_arg)) {
+        return nullptr;
+    }
+
+    signed int search_scope = get_file_open_flag_by_alias(search_scope_arg);
+
+    wchar_t* extracted_filename = Py_DecodeLocale(extracted_filename_arg, 0);
+
+    if (!SFileExtractFile(self->hmpq, extract_filename_arg, extracted_filename, search_scope)) {
+        return PyErr_Format(PympqBaseException, "Failed to extract file, error code: '%d'", GetLastError());
+    }
+
+    Py_RETURN_NONE;
+}
+
+PyDoc_STRVAR(
+    docstring_method_mpqobj_get_max_file_count,
+    "get_max_file_count() \n--\n\n"
+    ":returns: Max file count of the MPQ\n"
+    ":rtype: int\n\n"
+    "Implementation of 'SFileGetMaxFileCount'. Gets the max file count of the MPQ."
+);
+static PyObject* method_mpqobj_get_max_file_count(MpqObject* self, PyObject* args) {
+
+    int file_count = SFileGetMaxFileCount(self->hmpq);
+
+    return PyLong_FromLong(file_count);
+}
+
+PyDoc_STRVAR(
+    docstring_method_mpqobj_set_max_file_count,
+    "set_max_file_count(max_file_count /) \n--\n\n"
+    ":param int max_file_count: maximum number of files. Must be between HASH_TABLE_SIZE_MIN and HASH_TABLE_SIZE_MAX\n"
+    ":returns: None\n"
+    ":rtype: None\n\n"
+    "Implementation of 'SFileSetMaxFileCount'. Sets the max file count of the MPQ."
+);
+static PyObject* method_mpqobj_set_max_file_count(MpqObject* self, PyObject* args) {
+
+    unsigned int max_file_count_arg = 0;
+
+    if (!PyArg_ParseTuple(args, "I", &max_file_count_arg)) {
+        return nullptr;
+    }
+
+    if (!SFileSetMaxFileCount(self->hmpq, max_file_count_arg)) {
+        return PyErr_Format(PympqBaseException, "Failed to set max file count, error code: '%d'", GetLastError());
+    }
+
+    Py_RETURN_NONE;
+
+}
+
+PyDoc_STRVAR(
+    docstring_method_mpqobj_add_listfile,
+    "add_listfile(listfile_name /) \n--\n\n"
+    ":param str listfile_name: path-like string for the listfile to be added"
+    ":returns: None\n"
+    ":rtype: None\n\n"
+    "Implementation of 'SFileAddListFile'. Adds a listfile to the MPQ."
+);
+static PyObject* method_mpqobj_add_listfile(MpqObject* self, PyObject* args) {
+
+    char* listfile_name_arg = nullptr;
+
+    if (!PyArg_ParseTuple(args, "s", &listfile_name_arg)) {
+        return nullptr;
+    }
+
+    wchar_t* listfile_name = Py_DecodeLocale(listfile_name_arg, 0);
+
+    if (SFileAddListFile(self->hmpq, listfile_name)) {
+        return PyErr_Format(PympqBaseException, "Failed to add a listfile to the MPQ, error code: '%d'", GetLastError());
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef mpqobj_method_defs[] = {
 
     {"__enter__", (PyCFunction)method_mpqobj_ctxmanager_enter, METH_NOARGS, nullptr},
@@ -229,6 +402,13 @@ static PyMethodDef mpqobj_method_defs[] = {
     {"has_file", (PyCFunction)method_mpqobj_has_file, METH_VARARGS, docstring_method_mpqobj_has_file},
     {"open_file", (PyCFunction)method_mpqobj_open_file, METH_VARARGS, docstring_method_mpqobj_open_file},
     {"compact", (PyCFunction)method_mpqobj_compact, METH_VARARGS, docstring_method_mpqobj_compact},
+    {"verify", (PyCFunction)method_mpqobj_verify, METH_NOARGS, docstring_method_mpqobj_verify},
+    {"verify_file", (PyCFunction)method_mpqobj_verify_file, METH_VARARGS, docstring_method_mpqobj_verify_file},
+    {"rename_file", (PyCFunction)method_mpqobj_rename_file, METH_VARARGS, docstring_method_mpqobj_rename_file},
+    {"extract_file", (PyCFunction)method_mpqobj_extract_file, METH_VARARGS, docstring_method_mpqobj_extract_file},
+    {"get_max_file_count", (PyCFunction)method_mpqobj_get_max_file_count, METH_NOARGS, docstring_method_mpqobj_get_max_file_count},
+    {"set_max_file_count", (PyCFunction)method_mpqobj_set_max_file_count, METH_VARARGS, docstring_method_mpqobj_set_max_file_count},
+    {"add_listfile", (PyCFunction)method_mpqobj_add_listfile, METH_VARARGS, docstring_method_mpqobj_add_listfile},
 
     {nullptr, nullptr, 0, nullptr},
 };
