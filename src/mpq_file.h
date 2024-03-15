@@ -64,6 +64,10 @@ PyDoc_STRVAR(
 static PyObject* method_fileobj_get_size(MpqFileObject* self, PyObject* args) {
 
     int result = SFileGetFileSize(self->hFile, 0);
+    if (result == SFILE_INVALID_SIZE) {
+        return PyErr_Format(PympqBaseException, "Failed to get file size, error code: '%d'", GetLastError());
+    }
+
     return PyLong_FromLong(result);
 }
 

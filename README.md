@@ -15,6 +15,7 @@ pip install pympq
 ❌ SFileGetLocale  
 ❌ SFileFlushArchive  
 ✔️ SFileCloseArchive  
+✔️ SFileGetMaxFileCount  
 ✔️ SFileSetMaxFileCount  
 ❌ SFileSignArchive **Bugged**  
 ✔️ SFileCompactArchive  
